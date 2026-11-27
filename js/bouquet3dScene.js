@@ -50,8 +50,8 @@ const DEFAULT_COLORS = {
   tulipRed: [244, 66, 86], tulipCoral: [255, 128, 96], tulipYellow: [254, 212, 74],
   tulipPink: [248, 126, 178], tulipViolet: [186, 134, 244], tulipCream: [254, 240, 224],
   // Sakura branch (richer pinks so the renderer's brightness lift keeps them glowing pink, not white)
-  bark: [134, 92, 70], sakuraPink: [255, 108, 154], sakuraPale: [255, 158, 192],
-  sakuraCore: [224, 52, 108], sakuraPetal: [255, 132, 172],
+  bark: [134, 92, 70], sakuraPink: [232, 56, 118], sakuraPale: [255, 128, 176],
+  sakuraCore: [170, 24, 76], sakuraPetal: [255, 132, 172],
   // Stargazer lilies & lavender
   stargazer: [246, 104, 162], stargazerEdge: [255, 218, 234], anther: [208, 94, 48],
   lavender: [168, 126, 242], lavenderTip: [212, 182, 255], babysBreath: [246, 242, 252],
@@ -410,9 +410,7 @@ function addSunflower(scene, flower, start, random) {
 function addTulip(scene, flower, start, random) {
   const { points } = scene;
   // Build each tulip around a tilted vertical axis so its goblet points skyward.
-  const leanX = flower.x * .22;
-  const leanZ = flower.z * .22;
-  const axis = unit(leanX, 1, leanZ);
+  const axis = unit(flower.x * .34, 1, flower.z * .34);
   const sideA = unit(axis.z, 0, -axis.x || 1);
   const sideB = unit(
     axis.y * sideA.z - axis.z * sideA.y,
@@ -420,30 +418,34 @@ function addTulip(scene, flower, start, random) {
     axis.x * sideA.y - axis.y * sideA.x,
   );
   const phase = random() * TURN;
-  const height = flower.size * 1.48;
-  const maxRadius = flower.size * .56;
+  const height = flower.size * 1.55;
+  const maxRadius = flower.size * .50;
 
-  // 3 inner + 3 outer overlapping cupped petals curving upward and gently inward at the rim.
+  // 3 inner + 3 outer petals. Each one ends in its own point, so the rim reads as a crown.
   for (let pass = 0; pass < 2; pass += 1) {
     for (let k = 0; k < 3; k += 1) {
       const centerAngle = phase + pass * (Math.PI / 3) + k * (TURN / 3);
-      const radialBoost = pass === 0 ? .88 : 1.03;
+      const radialBoost = pass === 0 ? .84 : 1.04;
       const growth = addGrowth(scene, flower, start + pass * .07 + k * .04, .28);
-      for (let row = 0; row <= 20; row += 1) {
-        const progress = row / 20;
-        // Classic tulip profile: narrow base -> full rounded belly -> softly tucked rim.
-        const r = maxRadius * radialBoost * (.22 + .78 * Math.sin(progress * Math.PI * .74));
-        const h = height * progress;
-        const arcSpan = .92 * Math.sin(Math.PI * Math.min(1, .12 + progress * .88)) ** .65;
-        for (let column = -7; column <= 7; column += 1) {
-          const rib = column / 7;
+      for (let row = 0; row <= 22; row += 1) {
+        const progress = row / 22;
+        // Narrow base, full belly, rim drawn back in.
+        const r = maxRadius * radialBoost * (.20 + .80 * Math.sin(progress * Math.PI * .78));
+        const arcSpan = .98 * Math.sin(Math.PI * Math.min(1, .14 + progress * .74)) ** .5;
+        for (let column = -8; column <= 8; column += 1) {
+          const rib = column / 8;
+          const edge = Math.abs(rib);
+          // The sides of a petal stop lower than its middle: that makes the pointed tip.
+          const h = height * progress * (1 - .36 * edge ** 1.5) * (pass === 0 ? .93 : 1);
           const a = centerAngle + rib * arcSpan;
           const ca = Math.cos(a);
           const sa = Math.sin(a);
           const ox = sideA.x * ca + sideB.x * sa;
           const oy = sideA.y * ca + sideB.y * sa;
           const oz = sideA.z * ca + sideB.z * sa;
-          const shade = .34 + progress * .42 + (pass ? .06 : -.04) + .08 * (1 - Math.abs(rib));
+          // Dim middle, bright edges and tip: each petal keeps its outline in text characters.
+          const outline = edge > .74 || progress > .93 ? .34 : 0;
+          const shade = .16 + progress * .34 + outline + (pass ? 0 : -.16);
           points.push({
             x: flower.x + axis.x * h + ox * r,
             y: flower.y + axis.y * h + oy * r,
@@ -508,7 +510,8 @@ function addSakuraBlossom(scene, blossom, start, random) {
         const across = rib * .35 * length * profile;
         const radial = length * (.14 + .86 * progress);
         const lift = length * (.18 * progress ** 2 + .12 * Math.sin(Math.PI * progress));
-        const shade = .48 + progress * .34 + .08 * (1 - Math.abs(rib));
+        const rim = progress > .78 || Math.abs(rib) > .8 ? .20 : 0;
+        const shade = .22 + progress * .40 + rim;
         addOnFace(points, face, radial * cosine - across * sine, radial * sine + across * cosine,
           lift, color, shade, growth);
       }
@@ -650,24 +653,22 @@ function buildSunflowers(scene, random) {
 }
 
 function buildTulips(scene, random) {
+  // Three clear tiers with space between the heads, so every goblet shape stays readable.
   const tulips = [
-    { x: .00, y: .82, z: .02, size: .30, tilt: .0, color: 'tulipRed' },
-    { x: -.32, y: .72, z: .28, size: .28, tilt: -.6, color: 'tulipYellow' },
-    { x: .34, y: .70, z: .26, size: .28, tilt: .7, color: 'tulipCoral' },
-    { x: -.30, y: .74, z: -.30, size: .28, tilt: -2.3, color: 'tulipPink' },
-    { x: .32, y: .68, z: -.30, size: .28, tilt: 2.3, color: 'tulipViolet' },
-    { x: .02, y: .46, z: .54, size: .27, tilt: .0, color: 'tulipPink' },
-    { x: -.56, y: .42, z: .30, size: .27, tilt: -1.0, color: 'tulipRed' },
-    { x: .58, y: .42, z: .26, size: .27, tilt: 1.1, color: 'tulipYellow' },
-    { x: -.58, y: .44, z: -.24, size: .26, tilt: -1.9, color: 'tulipCream' },
-    { x: .56, y: .44, z: -.26, size: .26, tilt: 1.9, color: 'tulipRed' },
-    { x: -.02, y: .48, z: -.56, size: .27, tilt: 3.1, color: 'tulipCoral' },
-    { x: -.26, y: .22, z: .48, size: .25, tilt: -.5, color: 'tulipViolet' },
-    { x: .30, y: .22, z: -.48, size: .25, tilt: 2.5, color: 'tulipCream' },
+    { x: .02, y: .86, z: .00, size: .30, tilt: .0, color: 'tulipRed' },
+    { x: -.50, y: .56, z: .16, size: .29, tilt: -1.1, color: 'tulipYellow' },
+    { x: .52, y: .58, z: -.14, size: .29, tilt: 1.9, color: 'tulipViolet' },
+    { x: .14, y: .46, z: .52, size: .29, tilt: .3, color: 'tulipCream' },
+    { x: -.14, y: .52, z: -.52, size: .29, tilt: -2.9, color: 'tulipCoral' },
+    { x: -.40, y: .02, z: .48, size: .27, tilt: -.7, color: 'tulipPink' },
+    { x: .60, y: .08, z: .34, size: .27, tilt: 1.0, color: 'tulipCoral' },
+    { x: .38, y: .04, z: -.50, size: .27, tilt: 2.5, color: 'tulipYellow' },
+    { x: -.62, y: .06, z: -.32, size: .27, tilt: -2.1, color: 'tulipRed' },
   ];
   tulips.forEach((tulip, index) => {
     const start = .015 + (index % 7) * .02;
-    addStem(scene, tulip, index, start, random, { leafStyle: 'sword', leafCount: index % 2 === 0 ? 2 : 1 });
+    const leafCount = index > 4 ? 0 : index % 3 === 0 ? 2 : 1;
+    addStem(scene, tulip, index, start, random, { leafStyle: 'sword', leafCount });
     addTulip(scene, tulip, start + STEM_SPAN, random);
   });
   addTie(scene.points, 'tulipCream', 3, .13);
@@ -676,59 +677,72 @@ function buildTulips(scene, random) {
 
 function buildSakura(scene, random) {
   const { points } = scene;
-  // Main sweeping branch + sculptural 3D twigs reaching forward and back.
-  const segments = [
-    { from: { x: -.78, y: -1.14, z: -.22 }, to: { x: -.05, y: -.14, z: .04 }, r0: .046, r1: .034, bend: { x: -.12, y: .12, z: .08 }, start: .00, span: .22 },
-    { from: { x: -.05, y: -.14, z: .04 }, to: { x: .82, y: .84, z: .24 }, r0: .034, r1: .015, bend: { x: -.10, y: .24, z: .14 }, start: .18, span: .24 },
-    { from: { x: -.14, y: -.26, z: .00 }, to: { x: -.76, y: .66, z: .42 }, r0: .028, r1: .012, bend: { x: -.08, y: .16, z: .10 }, start: .16, span: .24 },
-    { from: { x: .14, y: .12, z: .08 }, to: { x: -.28, y: .98, z: -.52 }, r0: .025, r1: .011, bend: { x: .06, y: .16, z: -.10 }, start: .22, span: .22 },
-    { from: { x: .36, y: .36, z: .16 }, to: { x: .74, y: .12, z: -.56 }, r0: .022, r1: .010, bend: { x: .10, y: .14, z: -.08 }, start: .25, span: .20 },
-    { from: { x: -.42, y: .24, z: .24 }, to: { x: -.18, y: .62, z: .76 }, r0: .019, r1: .009, bend: { x: -.04, y: .10, z: .08 }, start: .26, span: .18 },
+  // One trunk rising from the tie, splitting into branches that carry a rounded crown of blossom.
+  const fork = { x: .02, y: -.58, z: .00 };
+  addWoodSegment(points, BASE, fork, .085, .062, { x: -.05, y: 0, z: .02 }, .00, .16);
+  const tips = [
+    { x: .04, y: .96, z: .02 },
+    { x: -.74, y: .52, z: .16 },
+    { x: .76, y: .56, z: -.12 },
+    { x: .16, y: .40, z: .72 },
+    { x: -.18, y: .46, z: -.72 },
+    { x: -.60, y: -.04, z: -.36 },
+    { x: .62, y: -.02, z: .40 },
   ];
-  for (const seg of segments) {
-    addWoodSegment(points, seg.from, seg.to, seg.r0, seg.r1, seg.bend, seg.start, seg.span);
-  }
-
-  const blossoms = [
-    { x: -.76, y: .68, z: .44, size: .20, tilt: -.72, color: 'sakuraPink' },
-    { x: -.56, y: .42, z: .34, size: .21, tilt: -.45, color: 'sakuraPale' },
-    { x: -.42, y: .12, z: .20, size: .18, tilt: -1.10, color: 'sakuraPink' },
-    { x: -.18, y: .64, z: .76, size: .20, tilt: -.18, color: 'sakuraPale' },
-    { x: -.32, y: .44, z: .54, size: .18, tilt: -.62, color: 'sakuraPink' },
-    { x: -.04, y: -.10, z: .12, size: .19, tilt: .22, color: 'sakuraPink' },
-    { x: .16, y: .26, z: .24, size: .22, tilt: .35, color: 'sakuraPale' },
-    { x: .44, y: .58, z: .34, size: .21, tilt: .64, color: 'sakuraPink' },
-    { x: .68, y: .76, z: .32, size: .20, tilt: .92, color: 'sakuraPale' },
-    { x: .86, y: .88, z: .22, size: .18, tilt: 1.15, color: 'sakuraPink' },
-    { x: .54, y: .86, z: .04, size: .19, tilt: 1.55, color: 'sakuraPale' },
-    { x: -.02, y: .60, z: -.20, size: .20, tilt: 2.65, color: 'sakuraPink' },
-    { x: -.20, y: .86, z: -.40, size: .21, tilt: -2.60, color: 'sakuraPale' },
-    { x: -.32, y: 1.02, z: -.54, size: .19, tilt: -2.25, color: 'sakuraPink' },
-    { x: .26, y: .44, z: -.28, size: .19, tilt: 2.40, color: 'sakuraPale' },
-    { x: .58, y: .34, z: -.34, size: .20, tilt: 2.05, color: 'sakuraPink' },
-    { x: .76, y: .12, z: -.58, size: .19, tilt: 2.55, color: 'sakuraPale' },
-    { x: .46, y: .16, z: -.54, size: .17, tilt: 2.95, color: 'sakuraPink' },
-    { x: -.58, y: -.56, z: -.08, size: .17, tilt: -1.40, color: 'sakuraPale' },
-  ];
-  blossoms.forEach((blossom, index) => {
-    addSakuraBlossom(scene, blossom, .32 + (index % 8) * .036, random);
+  const bends = tips.map(tip => ({ x: -tip.z * .12, y: .10, z: tip.x * .12 }));
+  tips.forEach((tip, index) => {
+    addWoodSegment(points, fork, tip, .046, .016, bends[index], .14 + index * .015, .24);
   });
 
-  // Drifting pink petals floating gently around the branch.
-  for (let i = 0; i < 48; i += 1) {
+  // A puff of small blossoms around each tip, turned different ways so some face the viewer
+  // from every side, plus a single blossom part of the way along every branch.
+  const cluster = [
+    { dx: 0, dy: .09, dz: 0, turn: 0 },
+    { dx: .19, dy: .00, dz: .06, turn: 1.3 },
+    { dx: -.18, dy: -.01, dz: -.07, turn: -1.3 },
+    { dx: .04, dy: -.07, dz: .19, turn: .2 },
+    { dx: -.06, dy: -.05, dz: -.19, turn: 3.1 },
+    { dx: .08, dy: -.20, dz: -.04, turn: 2.2 },
+  ];
+  const blossoms = [];
+  tips.forEach((tip, branch) => {
+    cluster.forEach((part, index) => {
+      blossoms.push({
+        x: tip.x + part.dx, y: tip.y + part.dy, z: tip.z + part.dz,
+        size: .125 + random() * .03,
+        tilt: part.turn + branch * .9 + (random() - .5) * .5,
+        color: (branch + index) % 3 === 0 ? 'sakuraPale' : 'sakuraPink',
+      });
+    });
+    const t = .58;
+    const arch = Math.sin(t * Math.PI);
+    const x = fork.x + (tip.x - fork.x) * t + bends[branch].x * arch;
+    const z = fork.z + (tip.z - fork.z) * t + bends[branch].z * arch;
+    blossoms.push({
+      x, y: fork.y + (tip.y - fork.y) * t + bends[branch].y * arch + .06, z, size: .13,
+      tilt: Math.atan2(x, z), color: branch % 2 === 0 ? 'sakuraPale' : 'sakuraPink',
+    });
+  });
+  blossoms.forEach((blossom, index) => {
+    addSakuraBlossom(scene, blossom, .34 + (index % 8) * .034, random);
+  });
+
+  // A few petals drifting down around the branches.
+  for (let i = 0; i < 22; i += 1) {
     const angle = random() * TURN;
-    const radius = .45 + .85 * random();
+    const radius = .50 + .60 * random();
     const cx = Math.cos(angle) * radius;
-    const cy = -1.0 + random() * 2.2;
+    const cy = -1.05 + random() * .95;
     const cz = Math.sin(angle) * radius;
-    const visibleAt = .68 + i * .006;
-    for (let d = 0; d < 3; d += 1) {
+    const visibleAt = .70 + i * .011;
+    for (let d = 0; d < 2; d += 1) {
       points.push({
-        x: cx + d * .014, y: cy - d * .009, z: cz + (d - 1) * .010,
-        normal: { x: 0, y: 1, z: 0 }, color: 'sakuraPetal', shade: .58 + random() * .30, visibleAt,
+        x: cx + d * .016, y: cy - d * .010, z: cz,
+        normal: { x: 0, y: 1, z: 0 }, color: 'sakuraPetal', shade: .30 + random() * .25, visibleAt,
       });
     }
   }
+  addTie(points, 'sakuraPale', 3, .11);
 }
 
 function buildLilies(scene, random) {

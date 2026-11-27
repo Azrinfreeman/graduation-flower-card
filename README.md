@@ -16,7 +16,7 @@ Works on phones and desktops. Turn your sound on for the effects.
 2. **Two questions.** Write your own inside jokes. The wrong answer runs away from the pointer or finger, then gives up after a few tries, so nobody gets stuck.
 3. **Congratulations.** The name appears with a burst of text-character confetti.
 4. **Your message.** It types out at a readable size and splits into pages on small screens, so nothing ever scrolls.
-5. **The bouquet.** Flowers bloom on the last page. Visitors can drag to spin them and use **← / →** to try all eight styles.
+5. **The bouquet.** Flowers bloom on the last page. Visitors use **← / →** to try all eight styles, and can drag the six 3D ones to spin them.
 
 ## Eight bouquet styles
 
@@ -28,7 +28,7 @@ Works on phones and desktops. Turn your sound on for the effects.
 | 2 | Velvet Roses | 3D layered roses with baby's breath |
 | 3 | Sunflowers & Daisies | 3D sunflowers with chamomile daisies |
 | 4 | Spring Tulips | 3D cupped tulips with long leaves |
-| 5 | Sakura Branch | 3D cherry-blossom branch with falling petals |
+| 5 | Sakura Branch | 3D branching cherry blossoms with falling petals |
 | 6 | Lilies & Lavender | 3D lilies, lavender spikes and baby's breath |
 | 7 | Text-Art Garden | Detailed flat bouquet in text characters |
 | 8 | Minimal Vector | Simple animated SVG illustration |

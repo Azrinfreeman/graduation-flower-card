@@ -149,7 +149,7 @@ export const cardConfig = {
     src: 'assets/audio/your-song.mp3',
     volume: 0.15, // Initial volume for the song and sound effects, from 0 to 1
     // Shown on the last page below the bouquet (leave empty '' to hide).
-    note: 'A bouquet made in code — drag to spin, or click the arrows to switch flowers.',
+    note: 'A bouquet made in code. Use the arrows to try the other styles.',
   },
 
   // After deploying your card, run `python tools/generate_qr.py https://your-url/` if you want a printable QR code.
