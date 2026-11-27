@@ -1,5 +1,7 @@
 # Graduation Flower Card
 
+![Three bouquets drawn in coloured text characters: roses, wildflowers and sunflowers](docs/images/cover.jpg)
+
 A small interactive graduation card you can personalise and send as a link. The visitor answers two playful questions, gets a "Congratulations" with confetti, reads your typed message, and finally sees a bouquet bloom, drawn entirely in code.
 
 It is plain HTML, CSS and JavaScript: no framework, no build step, no images for the flowers. Edit one file, upload the folder, and share the link.
