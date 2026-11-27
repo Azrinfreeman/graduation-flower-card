@@ -26,8 +26,13 @@ export function setupMusic(config) {
   const state = () => ({ enabled: Boolean(config.enabled), started, playing: !player.paused, volume: level });
   const notify = () => listeners.forEach(listener => listener(state()));
 
+  function onChange(listener) {
+    listeners.push(listener);
+  }
+
+  // The same volume setting is used when the card only has sound effects.
   if (!config.enabled) {
-    return { prime() {}, start() {}, toggle() {}, setVolume() {}, state, onChange() {} };
+    return { prime() {}, start() {}, toggle() {}, setVolume, state, onChange };
   }
 
   function clamp(value) { return Math.max(0, Math.min(1, Number(value) || 0)); }
@@ -80,6 +85,19 @@ export function setupMusic(config) {
     }
   }
 
+  function setVolume(value, { startPlayback = true } = {}) {
+    window.clearInterval(fadeTimer);
+    level = clamp(value);
+    save();
+    if (config.enabled) {
+      output(level);
+      if (startPlayback && level > 0 && player.paused) {
+        play();
+      }
+    }
+    notify();
+  }
+
   return {
     /** Call from a tap. Plays and pauses the file silently so a later start() is allowed (needed on iPhones). */
     prime() {
@@ -109,15 +127,7 @@ export function setupMusic(config) {
         }, 60);
       });
     },
-    /** The volume slider (0 to 1). Raising it above 0 also starts a song that was paused or blocked. */
-    setVolume(value) {
-      window.clearInterval(fadeTimer);
-      level = clamp(value);
-      save();
-      output(level);
-      if (level > 0 && player.paused) play();
-      notify();
-    },
+    setVolume,
     /** The icon when the song is not playing (autoplay blocked): start it at the chosen level (or the default). */
     toggle() {
       window.clearInterval(fadeTimer);
@@ -129,6 +139,6 @@ export function setupMusic(config) {
     },
     state,
     /** Calls `listener({ enabled, started, playing, volume })` whenever the song or volume changes. */
-    onChange(listener) { listeners.push(listener); },
+    onChange,
   };
 }

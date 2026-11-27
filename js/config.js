@@ -127,12 +127,27 @@ export const cardConfig = {
     },
   ],
 
+  // Short sound effects. Paths are relative to index.html. Set enabled to false to disable them.
+  sfx: {
+    enabled: true,
+    files: {
+      open: 'assets/audio/sfx/open.mp3',
+      tap: 'assets/audio/sfx/tap.mp3',
+      correct: 'assets/audio/sfx/correct.mp3',
+      wrong: 'assets/audio/sfx/wrong.mp3',
+      page: 'assets/audio/sfx/page.mp3',
+      bloom: 'assets/audio/sfx/bloom.mp3',
+      dodge: 'assets/audio/sfx/dodge.mp3',
+      switch: 'assets/audio/sfx/switch.mp3',
+    },
+  },
+
   // Optional background song. Off by default in this open-source template.
   // To add a song: put your MP3 in `assets/audio/your-song.mp3`, set `enabled: true`, and update `src` & `note`.
   music: {
     enabled: false,
     src: 'assets/audio/your-song.mp3',
-    volume: 0.15, // 0 to 1 (0.15 = 15%); visitors can adjust it with the corner volume icon
+    volume: 0.15, // Initial volume for the song and sound effects, from 0 to 1
     // Shown on the last page below the bouquet (leave empty '' to hide).
     note: 'A bouquet made in code — drag to spin, or click the arrows to switch flowers.',
   },

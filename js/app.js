@@ -9,6 +9,7 @@ import { sfx } from './sfx.js';
 const $ = id => document.getElementById(id);
 const screenIds = ['welcomeScreen', 'quizScreen', 'revealScreen'];
 const announce = $('announcement');
+const welcomeScreen = $('welcomeScreen');
 const revealScreen = $('revealScreen');
 const revealHeading = $('revealHeading');
 const graduateName = $('graduateName');
@@ -78,20 +79,23 @@ function updateBouquetPicker(info = bouquet.current()) {
 
 function switchBouquet(direction) {
   const info = direction > 0 ? bouquet.next({ quick: true }) : bouquet.prev({ quick: true });
+  sfx.play('switch');
   updateBouquetPicker(info);
   fitStage();
   announce.textContent = `${info.name}, bouquet ${info.index + 1} of ${info.total}`;
 }
 
-/* ---------- the little music button that follows the visitor across the pages ---------- */
+/* ---------- the shared sound volume ---------- */
 
 function updateFloatMusic() {
   const { enabled, playing, volume } = music.state();
-  musicControl.hidden = !(enabled && !revealScreen.hidden);
+  const effectsAvailable = cardConfig.sfx.enabled && welcomeScreen.hidden;
+  const musicAvailable = enabled && !revealScreen.hidden;
+  musicControl.hidden = !(effectsAvailable || musicAvailable);
   const percent = Math.round(volume * 100);
-  const sound = playing && percent > 0;
+  const sound = (effectsAvailable || playing) && percent > 0;
   floatMusic.dataset.sound = sound ? 'on' : 'off';
-  floatMusic.setAttribute('aria-label', `Song volume, ${sound ? `${percent} percent` : 'off'}`);
+  floatMusic.setAttribute('aria-label', `Sound volume, ${sound ? `${percent} percent` : 'off'}`);
   if (Number(volumeSlider.value) !== percent) volumeSlider.value = String(percent);
   volumeSlider.style.setProperty('--fill', `${percent}%`);
   volumeSlider.setAttribute('aria-valuetext', `${percent} percent`);
@@ -113,6 +117,7 @@ const volumeOpen = () => volumePanel.classList.contains('is-open');
 
 const pages = createCardPages({
   onChange({ index, total, type }) {
+    sfx.play('page');
     announce.textContent = `Page ${index + 1} of ${total}`;
     updateFloatMusic();
     if (type === 'end') showBouquet();
@@ -258,20 +263,15 @@ $('startButton').addEventListener('click', startQuiz);
 bouquetPrev.addEventListener('click', () => switchBouquet(-1));
 bouquetNext.addEventListener('click', () => switchBouquet(1));
 
-// Soft sounds for the other buttons (the answers and the start button make their own).
-document.addEventListener('click', event => {
-  const button = event.target.closest?.('button');
-  if (!button || button.disabled || button.id === 'startButton' || button.id === 'floatMusic') return;
-  if (button.classList.contains('answer-button')) return;
-  sfx.play(button.closest('.page-nav') ? 'page' : 'tap');
-});
 floatMusic.addEventListener('click', () => {
-  const { playing } = music.state();
-  if (!playing) music.toggle(); // autoplay was blocked or the song stopped: the first tap starts it
-  setVolumePanel(!volumeOpen() || !playing);
+  const { enabled, playing, volume } = music.state();
+  if (enabled && !revealScreen.hidden && !playing && volume > 0) {
+    music.toggle(); // retry the song if autoplay was blocked
+  }
+  setVolumePanel(!volumeOpen());
 });
 volumeSlider.addEventListener('input', () => {
-  music.setVolume(Number(volumeSlider.value) / 100);
+  music.setVolume(Number(volumeSlider.value) / 100, { startPlayback: !revealScreen.hidden });
   setVolumePanel(true); // restarts the idle timer
 });
 volumeSlider.addEventListener('pointerdown', () => window.clearTimeout(volumeTimer)); // no hiding mid-drag

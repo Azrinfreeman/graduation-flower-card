@@ -58,6 +58,7 @@ export function createQuiz(questions, onComplete, runaway = { enabled: false }) 
         giveUpAfter: runaway.giveUpAfter,
         avoid: () => [...others, title, feedback, back, counter],
         onDodge(count, { tired, pointerType }) {
+          sfx.play('dodge');
           const messages = runaway.messages ?? [];
           if (messages.length) feedback.textContent = messages[Math.min(count, messages.length) - 1];
           if (runaway.hintAfter > 0 && count >= runaway.hintAfter) correctButton?.classList.add('is-hinted');
@@ -99,7 +100,8 @@ export function createQuiz(questions, onComplete, runaway = { enabled: false }) 
     if (pendingAdvance !== null) window.clearTimeout(pendingAdvance);
     pendingAdvance = null;
     if (index > 0) {
-      index--;
+      sfx.play('tap');
+      index -= 1;
       render();
     }
   });

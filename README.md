@@ -20,8 +20,8 @@ A lightweight, customizable digital graduation card built with **vanilla HTML, C
   6. **Lilies & Lavender** — 3D stargazer lilies, tall lavender spikes & baby's breath
   7. **Text-Art Garden** — detailed 2D ASCII-style bouquet bloom
   8. **Minimal Vector** — clean CSS-animated inline SVG bouquet
-- **Optional background song** with fade-in and a minimal corner volume slider (off by default — drop in your own MP3)
-- **Original synthesized UI sound effects** via Web Audio API (no sound files required)
+- **Optional background song** with a quiet fade-in (off by default)
+- **Eight short sound effects**, including a paper page turn, with one corner volume control for effects and music
 
 ---
 
@@ -38,13 +38,14 @@ Download or fork this repository, then edit **[`js/config.js`](js/config.js)**:
 | `runawayWrongAnswer` | Toggle `enabled`, dodge count (`giveUpAfter`), hint glow (`hintAfter`), and tease messages |
 | `bouquetPicker.enabled` | `true` lets visitors click **← / →** to browse all bouquets; `false` locks to the first bouquet |
 | `bouquetGallery` | Reorder, remove, or recolor any of the 8 bouquet styles (the first entry blooms first) |
+| `sfx` | Set `enabled: false` to turn off effects, or change a path in `files` to use your own licensed clip |
 | `music` | Set `enabled: true`, place your MP3 in `assets/audio/`, and set `src` and `note` |
 
 To change colors or typography, edit the CSS variables at the top of [`css/main.css`](css/main.css).
 
 ### Adding your own background song
 
-Background music is **off by default** so the template ships with zero copyrighted audio.
+Background music is **off by default**. Supply a track you have rights to use.
 
 1. Put your MP3 file in `assets/audio/` (for example `assets/audio/your-song.mp3`).
 2. In `js/config.js`, set:
@@ -67,7 +68,9 @@ Because the site uses ES modules, serve it over HTTP rather than opening `index.
 python tools/serve.py
 ```
 
-Then open **http://localhost:8000/** in your browser. (You can also use VS Code's Live Server extension.)
+Then open [the card](http://localhost:8000/) in your browser.
+
+Open the [sound board](http://localhost:8000/tools/sound_board.html) to try each cue at the card’s default volume. To swap a sound, put your clip in `assets/audio/sfx/` and update its path under `sfx.files` in `js/config.js`.
 
 ---
 
@@ -101,4 +104,5 @@ python tools/verify_project.py
 
 - Code & procedural flower artwork: **MIT License** ([`LICENSE`](LICENSE))
 - Self-hosted heading font: **JetBrains Mono** under the SIL Open Font License 1.1 ([`assets/fonts/OFL-JetBrains-Mono.txt`](assets/fonts/OFL-JetBrains-Mono.txt))
+- Sound effects: **CC0 1.0** from Kenney and UI SFX
 - See [`docs/ASSETS_AND_LICENSES.md`](docs/ASSETS_AND_LICENSES.md) for details.

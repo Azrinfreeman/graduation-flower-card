@@ -13,15 +13,22 @@ required = [
     'js/bouquet3dScene.js', 'js/bouquet3dRenderer.js', 'js/bouquet3dMotion.js',
     'js/audio.js', 'js/confetti.js', 'js/sfx.js', 'js/toast.js',
     'assets/icons/favicon.svg', 'assets/fonts/jetbrains-mono-latin.woff2', 'assets/fonts/OFL-JetBrains-Mono.txt',
-    'docs/ASSETS_AND_LICENSES.md', 'docs/DEPLOYMENT_AND_QR.md',
+    'docs/ASSETS_AND_LICENSES.md', 'docs/DEPLOYMENT_AND_QR.md', 'tools/sound_board.html',
 ]
 for rel in required:
     assert (root / rel).is_file(), f'Missing required file: {rel}'
 
+# Verify all bundled effects, including the two optional interactions.
+sfx_names = ('open', 'tap', 'correct', 'wrong', 'page', 'bloom', 'dodge', 'switch')
+for name in sfx_names:
+    clip = root / 'assets' / 'audio' / 'sfx' / f'{name}.mp3'
+    assert clip.is_file() and clip.stat().st_size > 0, f'Missing or empty sound effect: {clip.relative_to(root)}'
+
 config = (root / 'js/config.js').read_text(encoding='utf-8')
 for preset in ('wildflower', 'roses', 'sunflowers', 'tulips', 'sakura', 'lilies', 'ascii-garden', 'minimal-svg'):
     assert preset in config, f'Missing bouquet preset in config.js: {preset}'
-assert 'enabled: false' in config, 'Music should default to off in the public template'
+music_settings = config.split('  music: {', 1)[1].split('  },', 1)[0]
+assert 'enabled: false' in music_settings, 'Music should default to off in the public template'
 
 # Verify local asset links in index.html
 html = (root / 'index.html').read_text(encoding='utf-8')
@@ -55,4 +62,4 @@ else:
         subprocess.run(['node', '--check', str(file)], check=True)
     print('JavaScript syntax passed')
 
-print(f'Static checks & privacy guard passed ({len(required)} required files, 8 bouquet presets).')
+print(f'Static checks & privacy guard passed ({len(required)} required files, {len(sfx_names)} sound effects, 8 bouquet presets).')

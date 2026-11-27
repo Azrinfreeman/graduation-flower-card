@@ -9,6 +9,7 @@
  * Pages turn with the Next/Back buttons, the dots, a swipe (touch) or the arrow keys.
  */
 import { cardConfig } from './config.js';
+import { sfx } from './sfx.js';
 
 const SWIPE_MIN = 48; // px of sideways movement that counts as a swipe
 /** A swipe that starts on one of these is not a page turn (sliders, the bouquet drag, buttons...). */
@@ -194,7 +195,10 @@ export function createCardPages({ onChange = () => {} } = {}) {
 
   backButton.addEventListener('click', () => goTo(index - 1));
   nextButton.addEventListener('click', () => goTo(index + 1));
-  skip.addEventListener('click', finishTyping);
+  skip.addEventListener('click', () => {
+    finishTyping();
+    sfx.play('tap');
+  });
 
   let swipe = null;
   pagesBox.addEventListener('pointerdown', event => {
