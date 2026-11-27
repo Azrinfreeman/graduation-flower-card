@@ -1,27 +1,47 @@
 # Graduation Flower Card
 
-A lightweight, customizable digital graduation card built with **vanilla HTML, CSS, and JavaScript (ES modules)** — zero frameworks, zero build step, and zero external dependencies.
+A small interactive graduation card you can personalise and send as a link. The visitor answers two playful questions, gets a "Congratulations" with confetti, reads your typed message, and finally sees a bouquet bloom, drawn entirely in code.
 
-**[Live Demo →](https://azrinfreeman.github.io/graduation-flower-card/)**
+It is plain HTML, CSS and JavaScript: no framework, no build step, no images for the flowers. Edit one file, upload the folder, and share the link.
 
-## Features
+### [▶ Play the live demo](https://azrinfreeman.github.io/graduation-flower-card/)
 
-- **Playful 2-question quiz** with a **runaway wrong answer** (dodges mouse pointers, hops away on mobile taps, and gives up after 5 tries so no one gets stuck)
-- **Paged card reveal** that fits every screen from 320px phones to wide desktops without scrolling:
-  1. Congratulations headline with falling text-character confetti
-  2. Auto-paginated typewriter message (with a skip button)
-  3. Blooming interactive bouquet gallery with **Previous / Next** style switching
-- **8 built-in flower bouquet varieties & styles** (all drawn in original code — no images):
-  1. **Wildflower Meadow** — 3D rotating poppies, daisies, cornflowers, lupines & lilies
-  2. **Velvet Roses** — 3D layered spiral crimson, blush & cream roses with baby's breath
-  3. **Sunflowers & Daisies** — 3D golden ray-petal sunflowers & chamomile daisies
-  4. **Spring Tulips** — 3D upright cupped tulips with sweeping sword leaves
-  5. **Sakura Branch** — 3D arching cherry-blossom branch with drifting pink petals
-  6. **Lilies & Lavender** — 3D stargazer lilies, tall lavender spikes & baby's breath
-  7. **Text-Art Garden** — detailed 2D ASCII-style bouquet bloom
-  8. **Minimal Vector** — clean CSS-animated inline SVG bouquet
-- **Optional background song** with a quiet fade-in (off by default)
-- **Eight short sound effects**, including a paper page turn, with one corner volume control for effects and music
+Works on phones and desktops. Turn your sound on for the effects.
+
+![The card from start to finish: cover, quiz, congratulations, message and the blooming bouquet](docs/images/card-flow.jpg)
+
+## How the card plays
+
+1. **Cover.** The heading types itself in. One tap opens the card.
+2. **Two questions.** Write your own inside jokes. The wrong answer runs away from the pointer or finger, then gives up after a few tries, so nobody gets stuck.
+3. **Congratulations.** The name appears with a burst of text-character confetti.
+4. **Your message.** It types out at a readable size and splits into pages on small screens, so nothing ever scrolls.
+5. **The bouquet.** Flowers bloom on the last page. Visitors can drag to spin them and use **← / →** to try all eight styles.
+
+## Eight bouquet styles
+
+![All eight bouquet styles](docs/images/bouquet-styles.jpg)
+
+| # | Style | Look |
+|---|---|---|
+| 1 | Wildflower Meadow | 3D poppies, daisies, cornflowers, lupines and lilies |
+| 2 | Velvet Roses | 3D layered roses with baby's breath |
+| 3 | Sunflowers & Daisies | 3D sunflowers with chamomile daisies |
+| 4 | Spring Tulips | 3D cupped tulips with long leaves |
+| 5 | Sakura Branch | 3D cherry-blossom branch with falling petals |
+| 6 | Lilies & Lavender | 3D lilies, lavender spikes and baby's breath |
+| 7 | Text-Art Garden | Detailed flat bouquet in text characters |
+| 8 | Minimal Vector | Simple animated SVG illustration |
+
+The 3D styles are point clouds rendered as coloured text characters on a canvas, and they turn on their own.
+
+## Also included
+
+- **Sound effects:** eight short CC0 clips (a paper page turn, soft chimes, a pop when the wrong answer runs away) with one corner volume control. Try them on the [sound board](https://azrinfreeman.github.io/graduation-flower-card/tools/sound_board.html).
+- **Optional background song:** off by default. Add your own MP3 and it fades in quietly after the first tap.
+- **Fits every screen:** tested from 320 px phones to wide desktops, portrait and landscape.
+- **Keyboard and screen-reader friendly:** every control works with Tab and Enter, and the bouquet turns with the arrow keys.
+- **No tracking:** no analytics, cookies or third-party requests.
 
 ---
 
