@@ -1,0 +1,41 @@
+/* Small tweaks for narrow, short and landscape screens. Everything must fit without scrolling. */
+
+@media (max-width: 599px) {
+  .primary-button { padding-inline: 24px; }
+}
+
+/* Phones held sideways (and any very short screen): compact side-by-side layouts */
+@media (max-height: 540px) and (orientation: landscape) {
+  .site-shell { padding: max(10px, env(safe-area-inset-top)) clamp(24px, 6vw, 64px) max(8px, env(safe-area-inset-bottom)); }
+  .music-control { top: 6px; }
+  .float-music { width: 34px; height: 34px; }
+  .volume-panel { height: 34px; }
+  /* cover: heading on the left, the rest on the right */
+  .screen--welcome { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: clamp(16px, 4vw, 48px); }
+  .display-heading { font-size: clamp(1.15rem, min(4.4vw, 9.5vh), 2.4rem); }
+  .lead { margin-bottom: clamp(6px, 2.4vh, 14px); }
+  .quiz-card { padding-block: clamp(8px, 2.6vh, 20px); }
+  .answer-list { grid-template-columns: 1fr 1fr; }
+  /* end page: the bouquet on the left, the note and "the end" on the right */
+  .card-page--end { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); grid-template-rows: minmax(0, 1fr); align-items: center; column-gap: clamp(16px, 4vw, 40px); }
+  .card-page--end > .bouquet-panel { height: 100%; }
+  .picker-button { min-width: 36px; min-height: 36px; padding: 0 8px; }
+  .bouquet-picker { gap: 8px; }
+}
+
+@media (max-height: 340px) and (orientation: landscape) {
+  .end-note { font-size: .85rem; line-height: 1.3; }
+  .fine-print { display: none; }
+  .wish-area { align-items: flex-start; }
+  .picker-button { min-width: 32px; min-height: 32px; }
+}
+
+/* extremely narrow screens (for example a phone zoomed in to 200%) */
+@media (max-width: 260px) {
+  .page-nav { gap: 4px; }
+  .nav-button { padding: 0 8px; font-size: .8rem; }
+  .page-dot { width: 14px; }
+  .site-shell { padding-inline: 12px; }
+  .bouquet-picker { gap: 6px; }
+  .picker-button { min-width: 34px; min-height: 36px; padding: 0 6px; }
+}

@@ -1,0 +1,12 @@
+.DS_Store
+Thumbs.db
+node_modules/
+*.log
+.env
+.env.*
+__pycache__/
+.venv/
+site/
+.wrangler/
+# archives of the project (rebuild or re-zip instead of committing)
+*.zip

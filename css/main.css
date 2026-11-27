@@ -1,0 +1,209 @@
+/* One look: flat black, light text, one red accent, a monospace face for headings and a system sans for reading.
+   Red is used only for the main button, the name, the current page dot, the typing cursor and focus rings. */
+:root {
+  --bg: #000;
+  --ink: #ececec;
+  --muted: #9d9da3;
+  --line: rgba(255, 255, 255, .2);
+  --line-strong: rgba(255, 255, 255, .55);
+  --accent: #ff4d5e;
+  --on-accent: #000;
+  --toast-bg: #ececec;
+  --toast-ink: #000;
+  /* petal colours of the SVG fallback bouquet (only used if the text bouquet cannot run) */
+  --flower: #ff4d5e;
+  --flower-secondary: #ececec;
+  --flower-tertiary: #ff9aa4;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; overflow: hidden; overscroll-behavior: none; background: var(--bg); }
+body {
+  margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; touch-action: manipulation;
+  background: var(--bg); color: var(--ink); font-family: var(--sans);
+  font-size: clamp(1rem, .95rem + .22vw, 1.12rem); line-height: 1.55; -webkit-font-smoothing: antialiased;
+}
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .65; cursor: wait; }
+:where(button, a, input, .question-heading, .reveal-heading, .rotating-bouquet):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (forced-colors: active) {
+  :where(button, a, input, .question-heading, .reveal-heading, .rotating-bouquet):focus-visible { outline-color: Highlight; }
+}
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+
+.site-shell {
+  position: relative; isolation: isolate; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
+  padding: max(18px, env(safe-area-inset-top)) clamp(18px, 5vw, 72px) max(14px, env(safe-area-inset-bottom));
+}
+.main-content { position: relative; z-index: 1; width: min(100%, 1100px); margin: 0 auto; flex: 1; min-height: 0; display: flex; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.main-content::-webkit-scrollbar { display: none; }
+/* margin-block:auto centres a screen and, if it is ever taller than the space (extreme zoom), scrolls inside the card, never the page */
+.screen { width: 100%; margin-block: auto; animation: fadeIn .3s ease both; }
+
+/* TYPE */
+.display-heading, .reveal-heading, .question-heading { font-family: var(--mono); letter-spacing: -.02em; }
+.display-heading { font-weight: 600; font-size: clamp(1.4rem, min(6vw, 6.4vh), 3.4rem); line-height: 1.3; margin: 0 auto clamp(6px, 1.4vh, 14px); text-wrap: balance; }
+.lead { color: var(--muted); max-width: 30em; margin: 0 auto clamp(14px, 3.4vh, 32px); font-size: clamp(.95rem, min(1rem + .2vw, 2.4vh), 1.1rem); line-height: 1.45; }
+.fine-print { margin: clamp(8px, 2.4vh, 24px) 0 0; color: var(--muted); font: 400 clamp(.78rem, 1.8vh, .88rem) var(--mono); }
+.screen--welcome { text-align: center; padding: 0; }
+
+/* BUTTONS */
+.primary-button, .secondary-button, .nav-button {
+  display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 0 24px;
+  border: 1px solid transparent; border-radius: 4px; font: 600 .95rem var(--mono); text-decoration: none; transition: background-color .15s, border-color .15s;
+}
+.primary-button { background: var(--accent); color: var(--on-accent); min-height: clamp(44px, 6.6vh, 52px); padding-inline: 32px; }
+.primary-button:hover { background: #ff6674; }
+.secondary-button, .nav-button { background: transparent; color: var(--ink); border-color: var(--line); font-weight: 500; }
+.secondary-button:hover, .nav-button:hover { border-color: var(--line-strong); }
+.text-button { background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; font-size: .95rem; color: var(--muted); padding: clamp(4px, 1.2vh, 10px) 0; }
+.text-button:hover { color: var(--ink); }
+
+/* QUIZ: the question and two answers sit directly on the page */
+.screen--quiz { display: grid; place-items: center; padding: 0; }
+.quiz-card { width: min(100%, 560px); text-align: center; }
+.question-count { margin: 0; color: var(--muted); font: 400 .85rem var(--mono); }
+.question-heading { font-weight: 500; font-size: clamp(1.15rem, min(3.8vw, 4vh), 1.7rem); line-height: 1.35; margin: clamp(10px, 2.4vh, 22px) 0 clamp(14px, 3vh, 28px); overflow-wrap: anywhere; }
+.question-heading:focus { outline: none; }
+.answer-list { display: grid; gap: clamp(8px, 1.4vh, 12px); }
+.answer-button { text-align: center; border: 1px solid var(--line); background: transparent; border-radius: 4px; padding: clamp(8px, 1.6vh, 16px) 19px; min-height: clamp(46px, 7.2vh, 58px); color: var(--ink); font: 500 clamp(.95rem, 2.4vh, 1.1rem) var(--mono); transition: border-color .15s; }
+.answer-button:hover { border-color: var(--line-strong); }
+.answer-button.correct { border-color: var(--ink); }
+.answer-button.incorrect { border-color: var(--muted); }
+.answer-feedback { min-height: clamp(22px, 3.6vh, 30px); font: 400 clamp(.8rem, 2vh, .95rem) var(--mono); color: var(--muted); margin: clamp(10px, 2vh, 18px) 0 2px; }
+/* Runaway wrong answer (js/runawayButton.js). Moves with the `translate` property so hover still works. */
+.runaway-arena { position: relative; }
+.answer-placeholder { border: 1px dashed var(--line); border-radius: 4px; opacity: .6; }
+.answer-button.is-runaway { position: absolute; left: 0; top: 0; z-index: 2; width: max-content; max-width: calc(100% - 16px); transition: translate .34s cubic-bezier(.2,.9,.3,1), border-color .15s, opacity .2s; }
+.answer-button.is-tired { opacity: .85; border-style: dashed; }
+.answer-button.is-hinted { border-color: var(--accent); }
+
+/* REVEAL: pages (congratulations, the wish, the end with the bouquet). Nothing on the page scrolls. */
+.screen--reveal { height: 100%; margin-block: 0; display: flex; flex-direction: column; }
+.card-pages { position: relative; flex: 1; min-height: 0; display: grid; }
+.card-page {
+  grid-area: 1 / 1; min-height: 0; display: flex; flex-direction: column; align-items: center; text-align: center;
+  overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; /* only ever scrolls inside the page, as a last resort */
+  opacity: 0; visibility: hidden; transform: translateX(24px);
+  transition: opacity .3s ease, transform .3s var(--ease-out), visibility 0s linear .3s;
+}
+.card-page::-webkit-scrollbar { display: none; }
+.card-page:focus { outline: none; }
+.card-page.is-current { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.card-page.is-before { transform: translateX(-24px); }
+
+/* page 1: just the greeting, centred. The bouquet lives on the last page. */
+.front-grid { flex: 1; min-height: 0; width: 100%; display: grid; place-items: center; }
+.bouquet-panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+.stage-fit { flex: 1; min-height: 0; width: 100%; display: grid; place-items: center; }
+.flower-stage { width: 100%; max-width: 540px; margin: 0 auto; }
+.ascii-bouquet { display: block; margin: 0 auto; width: 100%; height: auto; }
+.rotating-bouquet { aspect-ratio: 100 / 115; touch-action: pan-y pinch-zoom; }
+.rotating-bouquet.is-turnable { cursor: grab; }
+.rotating-bouquet.is-dragging { cursor: grabbing; }
+.bouquet-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.greeting-panel { min-width: 0; text-align: center; align-self: center; }
+.reveal-heading { font-weight: 600; font-size: clamp(1.4rem, min(6.2vw, 5.4vh), 3rem); line-height: 1.25; margin: 0 0 clamp(2px, .8vh, 10px); }
+.reveal-heading:focus { outline: none; } /* focus moves here after the reveal; it is not a control */
+.reveal-heading em { font-style: normal; color: var(--accent); }
+#graduateName { display: inline-block; white-space: nowrap; }
+.signature { margin: 0; font: 400 clamp(.95rem, min(3.6vw, 3.6vh), 1.35rem)/1.3 var(--mono); color: var(--muted); }
+
+/* page 2: the wish. The invisible copy of the text reserves the space, so typing never moves anything. */
+/* centred with auto margins (not justify-content:center), so if a page is ever too tall its top stays reachable */
+.card-page--wish { position: relative; justify-content: flex-start; }
+.card-page--wish > .wish-area { margin-block: auto; } /* the text sits in the middle of the page */
+/* "Show full message" is pinned to the bottom of the page, so it never moves the centred text */
+.card-page--wish #skipTypingButton { position: absolute; bottom: 0; left: 50%; translate: -50% 0; }
+.card-page--wish #skipTypingButton[hidden] { display: block !important; visibility: hidden; }
+.wish-area { flex: 0 1 auto; min-height: 0; width: min(100%, 34em); display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.wish { display: grid; width: 100%; margin-block: auto; text-align: left; line-height: 1.5; }
+.wish > * { grid-area: 1 / 1; }
+.wish-ghost { visibility: hidden; pointer-events: none; }
+.graduation-message { color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.wish.is-fresh { animation: fadeIn .5s ease both; }
+.type-cursor { color: var(--accent); display: inline; font-weight: bold; animation: blink .8s steps(2) infinite; }
+
+/* last page: the bouquet takes the free space, with the style picker underneath, then the note and "the end" */
+.card-page--end { justify-content: flex-start; gap: clamp(2px, 1vh, 12px); }
+.card-page--end > .bouquet-panel { flex: 1 1 0; width: 100%; gap: clamp(6px, 1.2vh, 12px); }
+.bouquet-picker { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; max-width: 100%; opacity: 0; }
+.card-page--end.is-current .bouquet-picker { animation: fadeIn 1.2s ease-out .5s both; }
+.picker-button { flex: none; min-width: 44px; min-height: 44px; padding: 0 12px; display: inline-grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--ink); font: 500 .95rem/1 var(--mono); transition: border-color .15s, color .15s; }
+.picker-button:hover { border-color: var(--line-strong); }
+.picker-label { min-width: 0; color: var(--muted); font: 400 clamp(.74rem, 1.8vh, .86rem)/1.2 var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.end-text { flex: none; width: min(100%, 30em); margin-block: auto; display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 2vh, 18px); opacity: 0; }
+.card-page--end.is-current .end-text { animation: fadeIn 1.6s ease-out .4s both; } /* arrives together with the bloom */
+.end-note { margin: 0; color: var(--muted); line-height: 1.5; font-size: clamp(.95rem, 2.3vh, 1.15rem); text-wrap: balance; }
+.the-end { margin: 0; color: var(--ink); font: 500 .95rem var(--mono); }
+
+/* page turning: Back, dots, Next. */
+.page-nav { flex: none; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; min-height: 48px; }
+.page-nav > #pageBack { grid-column: 1; justify-self: start; }
+.page-nav > .page-dots { grid-column: 2; }
+.page-nav > #pageNext { grid-column: 3; justify-self: end; }
+.nav-button { min-width: 44px; padding: 0 16px; font-size: .9rem; }
+.page-dots { display: flex; gap: 2px; }
+.page-nav.is-end .page-dots, .page-nav.is-end #pageNext { display: none; }
+.page-nav.is-end #pageBack { opacity: .6; }
+.page-dot { width: 24px; height: 44px; padding: 0; border: 0; background: transparent; position: relative; }
+.page-dot::after { content: ''; position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; translate: -50% -50%; border-radius: 50%; border: 1px solid var(--muted); background: transparent; }
+.page-dot[aria-current="page"]::after { background: var(--accent); border-color: var(--accent); }
+/* one fixed slot at the bottom for the page buttons, so nothing above ever moves */
+.reveal-footer { flex: none; display: grid; align-items: center; min-height: 48px; }
+.reveal-footer > * { grid-area: 1 / 1; }
+.page-nav[hidden] { display: grid !important; visibility: hidden; }
+
+/* the sound control: an icon that opens a volume slider */
+.music-control { position: absolute; top: clamp(10px, 2vh, 20px); right: clamp(12px, 3vw, 24px); z-index: 3; display: flex; align-items: center; gap: 8px; }
+.music-control[hidden] { display: none; }
+.volume-panel { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .2s ease, visibility 0s .2s; }
+.volume-panel.is-open { opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s; }
+.volume-readout { min-width: 3.6ch; text-align: right; font: 500 .8rem/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.volume-slider { --fill: 15%; -webkit-appearance: none; appearance: none; width: clamp(90px, 28vw, 140px); height: 28px; margin: 0; background: transparent; cursor: pointer; touch-action: none; }
+.volume-slider::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, var(--accent) var(--fill), var(--line) var(--fill)); }
+.volume-slider::-moz-range-track { height: 2px; background: var(--line); }
+.volume-slider::-moz-range-progress { height: 2px; background: var(--accent); }
+.volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px; border: 0; border-radius: 50%; background: var(--accent); }
+.volume-slider::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--accent); }
+.float-music { position: relative; flex: none; width: 40px; height: 40px; padding: 0; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--ink); font-size: 1.2rem; line-height: 1; }
+.float-music:hover { border-color: var(--line-strong); }
+.float-music[aria-expanded="true"] { border-color: var(--line-strong); }
+.float-music[data-sound="off"] { color: var(--muted); }
+.float-music[data-sound="off"]::after { content: ''; position: absolute; width: 22px; height: 1.5px; background: currentColor; rotate: -45deg; }
+
+/* Original SVG bouquet (the 'svg' style, a fallback); petal colours come from the variables above */
+.stem { stroke: url(#stemGradient); fill: none; stroke-width: 8; stroke-linecap: round; stroke-dasharray: 480; stroke-dashoffset: 480; }
+.leaf { fill: #86ad8f; opacity: 0; }
+.flower-group .bloom { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.flower-group--one .petal { fill: var(--flower); }
+.flower-group--two .petal { fill: var(--flower-secondary); }
+.flower-group--three .petal { fill: var(--flower-tertiary); }
+.flower-group--four .petal { fill: var(--flower-secondary); }
+.flower-group--five .petal { fill: var(--flower); }
+.flower-center { fill: #f5d48f; }
+.flower-dot { fill: #dca45f; opacity: .85; }
+.ribbon { opacity: 0; }
+.tiny-stars { opacity: 0; }
+
+/* Short on-page message (js/toast.js) */
+.toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); translate: -50% 0; z-index: 20; width: max-content; max-width: min(92vw, 520px); margin: 0; padding: 12px 18px; border-radius: 4px; background: var(--toast-bg); color: var(--toast-ink); font: 400 .9rem/1.4 var(--mono); overflow-wrap: anywhere; text-align: center; }
+
+/* Wide or landscape screens: the end page puts the bouquet on the left and the note on the right */
+@media (min-aspect-ratio: 5/4) and (min-width: 560px) {
+  .card-page--end { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); grid-template-rows: minmax(0, 1fr); align-items: center; column-gap: clamp(20px, 4vw, 68px); }
+  .card-page--end > .bouquet-panel { height: 100%; }
+  .reveal-heading { font-size: clamp(1.6rem, min(4vw, 7.4vh), 3rem); }
+  .signature { font-size: clamp(1rem, min(2.4vw, 4.2vh), 1.4rem); margin-top: clamp(4px, 1.4vh, 12px); }
+}
+
+/* The cover heading types itself in (js/app.js). An invisible full copy reserves the space. */
+.type-stack { display: grid; }
+.type-stack > * { grid-area: 1 / 1; }
+.type-ghost { visibility: hidden; }
+.type-live .cursor { display: inline-block; width: .55ch; height: 1em; margin-left: .1ch; vertical-align: -.12em; background: var(--accent); animation: blink .9s steps(2) infinite; }

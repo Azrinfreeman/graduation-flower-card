@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="An interactive digital graduation flower card with a playful quiz, typewriter wish, and rotating 3D text-art bouquets." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Graduation Flower Card" />
+  <meta property="og:description" content="An interactive digital graduation flower card with a playful quiz and blooming 3D text-art bouquets." />
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="css/fonts.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <title>Graduation Flower Card</title>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <div class="site-shell">
+    <div class="music-control" id="musicControl" hidden>
+      <div class="volume-panel" id="volumePanel" inert>
+        <input class="volume-slider" id="songVolume" type="range" min="0" max="100" step="1" value="15" aria-label="Song volume">
+        <output class="volume-readout" id="volumeReadout" for="songVolume" aria-hidden="true">15%</output>
+      </div>
+      <button class="float-music" id="floatMusic" type="button" aria-expanded="false" aria-controls="volumePanel" aria-label="Song volume"><span aria-hidden="true">♪</span></button>
+    </div>
+    <main id="mainContent" class="main-content">
+      <section id="welcomeScreen" class="screen screen--welcome" aria-labelledby="welcomeHeading">
+        <div class="cover-art">
+          <h1 id="welcomeHeading" class="display-heading">You did it.<br /><span class="line-two">Congratulations.</span></h1>
+        </div>
+        <div class="cover-actions">
+          <p class="lead">A small surprise, but first, two tiny questions. Think you know the answers?</p>
+          <button id="startButton" class="primary-button" type="button">Open your surprise</button>
+          <p class="fine-print">best with the sound on</p>
+        </div>
+      </section>
+
+      <section id="quizScreen" class="screen screen--quiz" aria-labelledby="questionText" hidden>
+        <div class="quiz-card">
+          <p class="question-count" id="questionCounter"></p>
+          <h2 id="questionText" class="question-heading"></h2>
+          <div class="answer-list" id="answerList"></div>
+          <p class="answer-feedback" id="answerFeedback" role="status" aria-live="polite"></p>
+          <button id="backButton" type="button" class="text-button">← Previous question</button>
+        </div>
+      </section>
+
+      <section id="revealScreen" class="screen screen--reveal" aria-label="Flower card" tabindex="-1" hidden>
+        <div class="card-pages" id="cardPages">
+
+          <!-- Page 1: the greeting. No flowers yet; they are the surprise at the end. -->
+          <section class="card-page card-page--front" id="pageFront" aria-label="Congratulations" tabindex="-1">
+            <div class="front-grid">
+              <div class="greeting-panel" id="greetingPanel" aria-hidden="true" inert>
+                <h1 id="revealHeading" class="reveal-heading" tabindex="-1">Congratulations,<br /><em id="graduateName"></em>!</h1>
+                <p class="signature" id="senderSignature"></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Page 2 (and more on small screens): the graduation message. Split into pages that fit. -->
+          <section class="card-page card-page--wish" id="pageWish" aria-label="Graduation message" tabindex="-1">
+            <div class="wish-area" id="wishArea">
+              <div class="wish" id="wish">
+                <div class="wish-ghost graduation-message" id="wishGhost" aria-hidden="true"></div>
+                <div class="wish-live graduation-message"><span id="typewriterText"></span><span class="type-cursor" id="typeCursor" aria-hidden="true" hidden>|</span></div>
+              </div>
+            </div>
+            <button class="text-button" id="skipTypingButton" type="button" hidden>Show full message</button>
+          </section>
+
+          <!-- Last page: the bouquet blooms here, with a flower style switcher and note. -->
+          <section class="card-page card-page--end" id="pageEnd" aria-label="The end" tabindex="-1">
+            <div class="bouquet-panel">
+              <div class="stage-fit" id="stageFit">
+                <div class="flower-stage" id="flowerStage" aria-label="Animated bouquet of flowers" role="img" tabindex="-1">
+                  <canvas id="asciiBouquet" class="ascii-bouquet" aria-hidden="true" hidden></canvas>
+                  <canvas id="rotatingBouquet" class="ascii-bouquet rotating-bouquet" role="img" aria-label="Three-dimensional bouquet in text characters" aria-describedby="bouquetKeyboardHint" hidden></canvas>
+                  <svg class="bouquet-svg" viewBox="0 0 640 625" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="stemGradient" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#87a890"/><stop offset="1" stop-color="#5d8d72"/>
+                      </linearGradient>
+                      <linearGradient id="ribbonGradient" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#dfa6ab"/><stop offset="1" stop-color="#c7798c"/>
+                      </linearGradient>
+                    </defs>
+                    <ellipse cx="320" cy="555" rx="160" ry="25" fill="#d8c8c1" opacity=".18" />
+                    <g class="flower-group flower-group--one" style="--flower-delay: .2s">
+                      <path class="stem" d="M320 555 Q260 370 193 203" />
+                      <path class="leaf" d="M292 459 Q210 420 224 360 Q297 384 292 459Z"/>
+                      <path class="leaf" d="M266 378 Q322 330 295 290 Q253 326 266 378Z"/>
+                      <g class="bloom" transform="translate(193 203)">
+                        <g class="petal-ring">
+                          <ellipse class="petal" cx="0" cy="-46" rx="29" ry="51"/>
+                          <ellipse class="petal" transform="rotate(60)" cx="0" cy="-46" rx="29" ry="51"/>
+                          <ellipse class="petal" transform="rotate(120)" cx="0" cy="-46" rx="29" ry="51"/>
+                          <ellipse class="petal" transform="rotate(180)" cx="0" cy="-46" rx="29" ry="51"/>
+                          <ellipse class="petal" transform="rotate(240)" cx="0" cy="-46" rx="29" ry="51"/>
+                          <ellipse class="petal" transform="rotate(300)" cx="0" cy="-46" rx="29" ry="51"/>
+                        </g>
+                        <circle class="flower-center" r="23"/>
+                        <circle class="flower-dot" r="9"/>
+                      </g>
+                    </g>
+                    <g class="flower-group flower-group--two" style="--flower-delay: .55s">
+                      <path class="stem" d="M320 555 Q339 352 320 124" />
+                      <path class="leaf" d="M322 387 Q386 331 362 291 Q308 321 322 387Z"/>
+                      <path class="leaf" d="M323 459 Q250 419 264 370 Q327 390 323 459Z"/>
+                      <g class="bloom" transform="translate(320 124)">
+                        <g class="petal-ring">
+                          <ellipse class="petal" cx="0" cy="-54" rx="33" ry="56"/>
+                          <ellipse class="petal" transform="rotate(60)" cx="0" cy="-54" rx="33" ry="56"/>
+                          <ellipse class="petal" transform="rotate(120)" cx="0" cy="-54" rx="33" ry="56"/>
+                          <ellipse class="petal" transform="rotate(180)" cx="0" cy="-54" rx="33" ry="56"/>
+                          <ellipse class="petal" transform="rotate(240)" cx="0" cy="-54" rx="33" ry="56"/>
+                          <ellipse class="petal" transform="rotate(300)" cx="0" cy="-54" rx="33" ry="56"/>
+                        </g>
+                        <circle class="flower-center" r="28"/>
+                        <circle class="flower-dot" r="12"/>
+                      </g>
+                    </g>
+                    <g class="flower-group flower-group--three" style="--flower-delay: .9s">
+                      <path class="stem" d="M320 555 Q389 345 458 207" />
+                      <path class="leaf" d="M379 413 Q449 394 448 342 Q381 350 379 413Z"/>
+                      <path class="leaf" d="M419 312 Q357 277 365 236 Q431 260 419 312Z"/>
+                      <g class="bloom" transform="translate(458 207)">
+                        <g class="petal-ring">
+                          <ellipse class="petal" cx="0" cy="-44" rx="27" ry="48"/>
+                          <ellipse class="petal" transform="rotate(60)" cx="0" cy="-44" rx="27" ry="48"/>
+                          <ellipse class="petal" transform="rotate(120)" cx="0" cy="-44" rx="27" ry="48"/>
+                          <ellipse class="petal" transform="rotate(180)" cx="0" cy="-44" rx="27" ry="48"/>
+                          <ellipse class="petal" transform="rotate(240)" cx="0" cy="-44" rx="27" ry="48"/>
+                          <ellipse class="petal" transform="rotate(300)" cx="0" cy="-44" rx="27" ry="48"/>
+                        </g>
+                        <circle class="flower-center" r="23"/>
+                        <circle class="flower-dot" r="9"/>
+                      </g>
+                    </g>
+                    <g class="flower-group flower-group--four" style="--flower-delay: 1.15s">
+                      <path class="stem" d="M320 555 Q261 426 150 336" />
+                      <path class="leaf" d="M258 473 Q203 467 193 414 Q261 430 258 473Z"/>
+                      <g class="bloom" transform="translate(150 336)">
+                        <g class="petal-ring">
+                          <ellipse class="petal" cx="0" cy="-33" rx="23" ry="40"/>
+                          <ellipse class="petal" transform="rotate(72)" cx="0" cy="-33" rx="23" ry="40"/>
+                          <ellipse class="petal" transform="rotate(144)" cx="0" cy="-33" rx="23" ry="40"/>
+                          <ellipse class="petal" transform="rotate(216)" cx="0" cy="-33" rx="23" ry="40"/>
+                          <ellipse class="petal" transform="rotate(288)" cx="0" cy="-33" rx="23" ry="40"/>
+                        </g>
+                        <circle class="flower-center" r="19"/>
+                        <circle class="flower-dot" r="8"/>
+                      </g>
+                    </g>
+                    <g class="flower-group flower-group--five" style="--flower-delay: 1.4s">
+                      <path class="stem" d="M320 555 Q413 453 503 359" />
+                      <path class="leaf" d="M391 471 Q451 451 456 405 Q393 409 391 471Z"/>
+                      <g class="bloom" transform="translate(503 359)">
+                        <g class="petal-ring">
+                          <ellipse class="petal" cx="0" cy="-34" rx="22" ry="40"/>
+                          <ellipse class="petal" transform="rotate(72)" cx="0" cy="-34" rx="22" ry="40"/>
+                          <ellipse class="petal" transform="rotate(144)" cx="0" cy="-34" rx="22" ry="40"/>
+                          <ellipse class="petal" transform="rotate(216)" cx="0" cy="-34" rx="22" ry="40"/>
+                          <ellipse class="petal" transform="rotate(288)" cx="0" cy="-34" rx="22" ry="40"/>
+                        </g>
+                        <circle class="flower-center" r="19"/>
+                        <circle class="flower-dot" r="8"/>
+                      </g>
+                    </g>
+                    <g class="ribbon" transform="translate(320 516)">
+                      <path d="M-12 -7 Q-95 -62 -90 0 Q-86 43 -5 8Z" fill="url(#ribbonGradient)"/>
+                      <path d="M12 -7 Q95 -62 90 0 Q86 43 5 8Z" fill="url(#ribbonGradient)"/>
+                      <path d="M-7 4 L-50 77 L-16 64 L5 11Z" fill="#df9aa9"/>
+                      <path d="M6 4 L52 76 L22 67 L-5 11Z" fill="#c77c91"/>
+                      <ellipse rx="24" ry="20" fill="#b96178"/>
+                    </g>
+                    <g class="tiny-stars" fill="#d3a26f">
+                      <path d="M92 166 l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5Z"/>
+                      <path d="M531 107 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4Z"/>
+                      <path d="M563 264 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3Z"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+              <div class="bouquet-picker" id="bouquetPicker" role="group" aria-label="Choose bouquet style">
+                <button class="picker-button" id="bouquetPrev" type="button" aria-label="Previous bouquet"><span aria-hidden="true">←</span></button>
+                <span class="picker-label" id="bouquetLabel">1 / 8 · Wildflower Meadow</span>
+                <button class="picker-button" id="bouquetNext" type="button" aria-label="Next bouquet"><span aria-hidden="true">→</span></button>
+              </div>
+              <p class="sr-only" id="bouquetKeyboardHint">The bouquet turns by itself. Drag it, or use the left and right arrow keys, to turn it yourself.</p>
+            </div>
+            <div class="end-text">
+              <p class="end-note" id="songNote"></p>
+              <p class="the-end">the end</p>
+            </div>
+          </section>
+        </div>
+
+        <div class="reveal-footer">
+          <nav class="page-nav" id="pageNav" aria-label="Card pages" hidden>
+            <button class="nav-button" id="pageBack" type="button">Back</button>
+            <div class="page-dots" id="pageDots"></div>
+            <button class="nav-button nav-button--next" id="pageNext" type="button"><span id="pageNextLabel">Next</span></button>
+          </nav>
+        </div>
+      </section>
+    </main>
+
+  </div>
+  <audio id="backgroundMusic" preload="none" loop></audio>
+  <p id="toast" class="toast" role="status" aria-live="polite" hidden></p>
+  <div class="sr-only" id="announcement" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+@keyframes fadeIn { from {opacity:0} to {opacity:1} }
+@keyframes blink { 50% {opacity:0} }
+@keyframes dodgeWiggle { 0%,100% {rotate:0deg} 25% {rotate:-6deg} 50% {rotate:5deg} 75% {rotate:-3deg} }
+.answer-button.is-dodging { animation: dodgeWiggle .42s ease-out; }
+
+/* SVG fallback bouquet (only used if the text bouquet cannot run) */
+@keyframes growStem { from {stroke-dashoffset:480} to {stroke-dashoffset:0} }
+@keyframes leafAppear { from {opacity:0;transform:scale(.7)} to {opacity:1;transform:scale(1)} }
+@keyframes bloomOpen { 0% {opacity:0;scale:.06;rotate:-25deg} 70% {opacity:1;scale:1.1;rotate:3deg} 100% {opacity:1;scale:1;rotate:0deg} }
+.flower-stage.is-blooming .stem { animation:growStem 1.25s cubic-bezier(.4,0,.1,1) forwards; animation-delay:var(--flower-delay); }
+.flower-stage.is-blooming .leaf { transform-box:fill-box; transform-origin:center; animation:leafAppear .85s ease-out forwards; animation-delay:calc(var(--flower-delay) + .65s); }
+.flower-stage.is-blooming .bloom { animation:bloomOpen 1s cubic-bezier(.2,.8,.3,1) forwards; animation-delay:calc(var(--flower-delay) + .85s); }
+.flower-stage.is-blooming .ribbon { animation:fadeIn .6s ease forwards; animation-delay:1.5s; }
+.flower-stage.is-blooming .tiny-stars { animation:fadeIn .8s ease forwards; animation-delay:2s; }
+.flower-stage.is-blooming .flower-group .petal-ring { transform-box:fill-box; transform-origin:center; }
+.flower-stage.is-bloomed .stem { stroke-dashoffset:0; }
+.flower-stage.is-bloomed .leaf,.flower-stage.is-bloomed .bloom,.flower-stage.is-bloomed .ribbon,.flower-stage.is-bloomed .tiny-stars { opacity:1; }
+
+/* Tapping "Open your surprise": the cover simply fades out */
+body.is-opening .screen--welcome { opacity: 0; transition: opacity .25s ease; pointer-events: none; }
+
+/* After the bloom, the greeting fades in slowly (name first, then the signature); then Next appears */
+.greeting-panel { opacity: 0; transition: opacity 1.6s ease-out; }
+.greeting-panel.is-shown { opacity: 1; }
+.greeting-panel .signature { opacity: 0; transition: opacity 1.2s ease-out 1s; }
+.greeting-panel.is-shown .signature { opacity: 1; }
+.page-nav:not([hidden]) { animation: fadeIn .6s ease both; }

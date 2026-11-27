@@ -1,0 +1,9 @@
+/* Self-hosted font (SIL Open Font License; see docs/ASSETS_AND_LICENSES.md). Latin subset only.
+   Headings and labels use JetBrains Mono; reading text uses the device's own system font. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../assets/fonts/jetbrains-mono-latin.woff2') format('woff2');
+}
